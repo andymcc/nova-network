@@ -21,8 +21,12 @@ action :create_fixed do
   if new_resource.multi_host
     multi_host_bool_mangle="T"
   end
+  vlan_comm=""
+  if new_resource.vlan_id.is_a? Integer
+    vlan_comm="--vlan=#{new_resource.vlan_id}"
+  end
   execute "nova-manage network create --label=#{new_resource.label}" do
-    command "nova-manage network create --multi_host=#{multi_host_bool_mangle} --label=#{new_resource.label} --fixed_range_v4=#{new_resource.fixed_range} --bridge=#{new_resource.bridge} --bridge_interface=#{new_resource.bridge_int} --dns1=#{new_resource.dns1} --dns2=#{new_resource.dns2}"
+    command "nova-manage network create --multi_host=#{multi_host_bool_mangle} --label=#{new_resource.label} --fixed_range_v4=#{new_resource.fixed_range} --bridge=#{new_resource.bridge} --bridge_interface=#{new_resource.bridge_int} --dns1=#{new_resource.dns1} --dns2=#{new_resource.dns2} #{vlan_comm}"
     action :run
     not_if "nova-manage network list | grep #{new_resource.fixed_range}"
   end
